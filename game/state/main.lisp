@@ -7,10 +7,8 @@
 
 (def-game-state main ()
   :start-process
-  (lambda (_this)
-    (declare (ignore _this))
+  (state-lambda ()
     t)
   :process
-  (lambda (_this)
-    (declare (ignore _this))
+  (state-lambda ()
     nil))

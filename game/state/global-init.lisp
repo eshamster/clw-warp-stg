@@ -7,13 +7,12 @@
 
 (def-game-state global-init ()
   :start-process
-  (lambda (_this)
+  (state-lambda ()
     (load-font "js/")
     t)
   :process
-  (lambda (_this)
-    (declare (ignore _this))
+  (state-lambda ()
     (make-state :main))
   :end-process
-  (lambda (_this)
+  (state-lambda ()
     t))
