@@ -12,6 +12,8 @@
   (:import-from :clw-warp-stg/game/parameter
                 :get-param
                 :get-depth)
+  (:import-from :clw-warp-stg/game/player/shot
+                :make-shot-maker)
   (:import-from :ps-experiment/common-macros
                 :setf-with))
 (in-package :clw-warp-stg/game/player/utils)
@@ -19,8 +21,14 @@
 (defun.ps+ init-basic-player ()
   (let* ((marker (make-target-marker))
          (player (make-player-entity marker))
-         (line (make-line-to-marker player marker)))
+         (line (make-line-to-marker player marker))
+         (shot-maker (make-shot-maker
+                      :fn-get-player-point (lambda ()
+                                             (calc-global-point player))
+                      :fn-get-target-point (lambda ()
+                                             (calc-global-point marker)))))
     (add-ecs-entity player)
+    (add-ecs-entity shot-maker player)
     (add-ecs-entity marker)
     (add-ecs-entity line)
     (values player marker line)))

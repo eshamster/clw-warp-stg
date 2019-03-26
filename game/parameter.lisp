@@ -30,7 +30,13 @@
 (defvar.ps+ *params*
   (convert-to-layered-hash
    (:player (:r #lx6
-             :marker (:r #lx12)))))
+             :marker (:r #lx12)
+             :shot (:width #lx40 :height #ly7
+                    :speed #lx15
+                    :interval 8
+                    :num-once 5
+                    :barrel-dist #lx40
+                    :barrel-angle (* 2/3 PI))))))
 
 (defmacro.ps+ get-param (&rest keys)
   `(get-layered-hash *params* ,@keys))
@@ -39,7 +45,8 @@
     (convert-to-layered-hash
      (:background -1000
       :player 0
-      :marker -1)))
+      :shot -20
+      :marker -10)))
 
 (defmacro.ps+ get-depth (&rest keys)
   `(get-layered-hash *depth* ,@keys))
