@@ -15,4 +15,8 @@
   (init-input))
 
 (defun.ps+ update-func ()
+  (let ((count 0))
+    (do-ecs-entities entity
+      (incf count))
+    (add-to-monitoring-log (+ "Entity count: " count)))
   (process-game-state))
