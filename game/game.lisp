@@ -19,4 +19,5 @@
     (do-ecs-entities entity
       (incf count))
     (add-to-monitoring-log (+ "Entity count: " count)))
+  (setf-collider-model-enable t)
   (process-game-state))

@@ -5,9 +5,9 @@
         :cl-web-2d-game)
   (:export :make-shot-maker)
   (:import-from :clw-warp-stg/game/parameter
-                :get-param)
-  (:import-from :clw-warp-stg/game/parameter
-                :get-depth))
+                :get-param
+                :get-depth
+                :get-collision-target))
 (in-package :clw-warp-stg/game/player/shot)
 
 (defun.ps+ make-shot-maker (&key fn-get-player-point
@@ -77,6 +77,12 @@
                                             :height height
                                             :color #x0000ff)
                     :depth (get-depth :shot))
+     (make-physic-rect :width width :height height
+                       :target-tags (get-collision-target :shot)
+                       :on-collision (lambda (mine other)
+                                       (declare (ignore other))
+                                       (when (find-the-entity mine)
+                                         (delete-ecs-entity mine))))
      (make-script-2d :func #'delete-if-out-of-screen)
      (init-entity-params :width width
                          :height height))

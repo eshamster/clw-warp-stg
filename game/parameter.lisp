@@ -4,7 +4,8 @@
         :cl-web-2d-game)
   (:export :get-param
            :get-depth
-           :get-state-param))
+           :get-state-param
+           :get-collision-target))
 (in-package :clw-warp-stg/game/parameter)
 
 (eval-when (:execute :compile-toplevel :load-toplevel)
@@ -55,5 +56,9 @@
   (convert-to-layered-hash
    ()))
 
-(defmacro.ps+ get-state-param (&rest keys)
-  `(get-layered-hash *state-params* ,@keys))
+(defun.ps+ get-collision-target (kind)
+  (ecase kind
+    (:player '(:block :enemy))
+    (:shot '(:block :enemy))
+    (:block '(:shot :player))
+    (:enemy '(:shot :player))))
