@@ -18,10 +18,10 @@
                              (control-player entity))))))
 
 (defun.ps+ control-player (player)
-  (when (or (key-up-now-p :a)
-            (= (get-left-mouse-state) :up-now))
+  (when (or (key-down-now-p :a)
+            (= (get-left-mouse-state) :down-now))
     (warp-player-to
      player (get-mouse-x) (get-mouse-y)))
-  (when (key-up-now-p :b)
+  (when (key-down-p :b)
     (move-target-to
      player (get-mouse-x) (get-mouse-y))))
