@@ -15,7 +15,8 @@
   (:import-from :clw-warp-stg/game/player/shot
                 :make-shot-maker)
   (:import-from :ps-experiment/common-macros
-                :setf-with))
+                :setf-with
+                :with-slots-pair))
 (in-package :clw-warp-stg/game/player/utils)
 
 (defun.ps+ init-basic-player ()
@@ -44,17 +45,46 @@
 
 (defun.ps+ warp-player-to (player target-x target-y)
   (setf-with (get-ecs-component 'point-2d player)
-    x target-x
-    y target-y))
+    x (min #lx1000 (max #lx0 target-x))
+    y (min #ly1000 (max #ly0 target-y))))
 
+;; XXX: Should calc current-point as global point.
+;;      And set it as local point of marker.
+;;      Currently they are same.
 (defun.ps+ move-target-to (player target-x target-y)
-  (setf-with (get-ecs-component
-              'point-2d
-              (get-entity-param player :target-marker))
-    x target-x
-    y target-y))
+  (let* ((target (get-entity-param player :target-marker))
+         (current-point (get-ecs-component 'point-2d target))
+         (player-point (calc-global-point player)))
+    (with-slots (x y) current-point
+      (setf x target-x
+            y target-y)
+      (flet ((adjust-point (x-p value)
+               (let ((new-point (calc-point-on-line
+                                 player-point current-point x-p value)))
+                 (setf x (point-2d-x new-point)
+                       y (point-2d-y new-point)))))
+        (when (< x #lx0)
+          (adjust-point t #lx0))
+        (when (> x #lx1000)
+          (adjust-point t #lx1000))
+        (when (< y #ly0)
+          (adjust-point nil #ly0))
+        (when (< y #ly0)
+          (adjust-point nil #ly1000))))))
 
 ;; --- internal --- ;;
+
+(defun.ps+ calc-point-on-line (pnt1 pnt2 x-p value)
+  (with-slots-pair (((x1 x) (y1 y)) pnt1
+                    ((x2 x) (y2 y)) pnt2)
+    (assert (or (and x-p       (not (= x1 x2)))
+                (and (not x-p) (not (= y1 y2)))))
+    (let ((lerp-alpha
+           (if x-p
+               (/ (- value x1) (- x2 x1))
+               (/ (- value y1) (- y2 y1)))))
+      (make-point-2d :x (lerp-scalar x1 x2 lerp-alpha)
+                     :y (lerp-scalar y1 y2 lerp-alpha)))))
 
 (defun.ps+ make-player-entity (target-marker)
   (let ((player (make-ecs-entity)))
