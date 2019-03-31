@@ -5,6 +5,9 @@
         :cl-web-2d-game)
   (:import-from :clw-warp-stg/game/parameter
                 :get-depth)
+  (:import-from :clw-warp-stg/game/block
+                :make-rect-block
+                :make-circle-block)
   (:import-from :clw-warp-stg/game/player/main
                 :init-player))
 (in-package :clw-warp-stg/game/state/main)
@@ -24,6 +27,14 @@
         :depth (get-depth :background)))
       (add-ecs-entity background))
     (init-player)
+    ;; Test
+    (add-ecs-entity
+     (make-rect-block :width #lx100 :height #lx200
+                      :point (make-point-2d :x #lx700 :y #lx600
+                                            :angle (* PI 1/6))))
+    (add-ecs-entity
+     (make-circle-block :r #lx100
+                        :point (make-point-2d :x #lx700 :y #lx200)))
     t)
   :process
   (state-lambda ()

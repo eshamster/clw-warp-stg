@@ -47,7 +47,8 @@
      (:background -1000
       :player 0
       :shot -20
-      :marker -10)))
+      :marker -10
+      :block 100)))
 
 (defmacro.ps+ get-depth (&rest keys)
   `(get-layered-hash *depth* ,@keys))
