@@ -8,6 +8,8 @@
   (:import-from :clw-warp-stg/game/block
                 :make-rect-block
                 :make-circle-block)
+  (:import-from :clw-warp-stg/game/enemy/common
+                :make-circle-enemy)
   (:import-from :clw-warp-stg/game/player/main
                 :init-player))
 (in-package :clw-warp-stg/game/state/main)
@@ -27,7 +29,8 @@
         :depth (get-depth :background)))
       (add-ecs-entity background))
     (init-player)
-    ;; Test
+    ;; --- Test --- ;;
+    ;; Block
     (add-ecs-entity
      (make-rect-block :width #lx100 :height #lx200
                       :point (make-point-2d :x #lx700 :y #lx600
@@ -35,6 +38,11 @@
     (add-ecs-entity
      (make-circle-block :r #lx100
                         :point (make-point-2d :x #lx700 :y #lx200)))
+    ;; Enemy
+    (add-ecs-entity
+     (make-circle-enemy :r #lx50
+                        :point (make-point-2d :x #lx200 :y #lx200)
+                        :duration 20))
     t)
   :process
   (state-lambda ()
