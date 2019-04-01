@@ -27,17 +27,13 @@
      :duration duration)))
 
 (defun.ps+ make-circle-enemy (&key point r duration)
-  (let ((offset (make-point-2d :x (* -1 r)
-                               :y (* -1 r))))
-    (make-primitive-enemy
-     :point point
-     :physic (make-physic-circle :r r
-                                 :offset offset)
-     :model (make-model-2d :model (make-solid-circle
-                                   :r r :color *default-color*)
-                           :offset offset
-                           :depth (get-depth :block))
-     :duration duration)))
+  (make-primitive-enemy
+   :point point
+   :physic (make-physic-circle :r r)
+   :model (make-model-2d :model (make-solid-circle
+                                 :r r :color *default-color*)
+                         :depth (get-depth :block))
+   :duration duration))
 
 (defun.ps+ make-primitive-enemy (&key point physic model
                                       duration)

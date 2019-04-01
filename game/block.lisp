@@ -24,15 +24,11 @@
                                       :depth (get-depth :block)))))
 
 (defun.ps+ make-circle-block (&key point r)
-  (let ((offset (make-point-2d :x (* -1 r)
-                               :y (* -1 r))))
-    (make-block :point point
-                :physic (make-physic-circle :r r
-                                            :offset offset)
-                :model (make-model-2d :model (make-solid-circle
-                                              :r r :color *default-color*)
-                                      :offset offset
-                                      :depth (get-depth :block)))))
+  (make-block :point point
+              :physic (make-physic-circle :r r)
+              :model (make-model-2d :model (make-solid-circle
+                                            :r r :color *default-color*)
+                                    :depth (get-depth :block))))
 
 ;; --- internal --- ;;
 
