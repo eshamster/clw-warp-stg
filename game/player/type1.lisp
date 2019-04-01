@@ -4,10 +4,11 @@
         :cl-ps-ecs
         :cl-web-2d-game)
   (:export :init-player-type1)
+  (:import-from :clw-warp-stg/game/player/target-marker
+                :move-target-to)
   (:import-from :clw-warp-stg/game/player/utils
                 :init-basic-player
-                :warp-player-to
-                :move-target-to))
+                :warp-player-to))
 (in-package :clw-warp-stg/game/player/type1)
 
 (defun.ps+ init-player-type1 ()
