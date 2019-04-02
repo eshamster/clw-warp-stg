@@ -27,13 +27,16 @@
             (= (get-left-mouse-state) :down-now))
     (warp-player-to
      player (get-mouse-x) (get-mouse-y)))
-  (when (key-down-now-p :b)
-    (let ((enemy (find-enemy-under-mouse)))
-      (when enemy
-        (lock-on-enemy player enemy))))
-  (when (and (key-down-p :b)
-             (not (lock-on-enemy-p player)))
-    (move-target-to player (get-mouse-x) (get-mouse-y))))
+  (flet ((move-target-to-mouse ()
+           (move-target-to player (get-mouse-x) (get-mouse-y))))
+    (when (key-down-now-p :b)
+      (let ((enemy (find-enemy-under-mouse)))
+        (if enemy
+            (lock-on-enemy player enemy)
+            (move-target-to-mouse))))
+    (when (and (key-down-p :b)
+               (not (lock-on-enemy-p player)))
+      (move-target-to-mouse))))
 
 ;; TODO: This should be shared with other player types.
 (defun.ps+ find-enemy-under-mouse ()
