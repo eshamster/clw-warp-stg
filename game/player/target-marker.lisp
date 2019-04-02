@@ -4,7 +4,9 @@
         :cl-ps-ecs
         :cl-web-2d-game)
   (:export :make-target-marker
-           :move-target-to)
+           :move-target-to
+           :lock-on-enemy
+           :lock-on-enemy-p)
   (:import-from :clw-warp-stg/game/parameter
                 :get-param
                 :get-depth)
@@ -16,8 +18,8 @@
 ;;      And set it as local point of marker.
 ;;      Currently they are same.
 (defun.ps+ move-target-to (player target-x target-y)
-  (let* ((target (get-entity-param player :target-marker))
-         (current-point (get-ecs-component 'point-2d target))
+  (let* ((marker (get-target-marker-from-player player))
+         (current-point (get-ecs-component 'point-2d marker))
          (player-point (calc-global-point player)))
     (with-slots (x y) current-point
       (setf x target-x
@@ -34,9 +36,24 @@
         (when (< y #ly0)
           (adjust-point nil #ly0))
         (when (< y #ly0)
-          (adjust-point nil #ly1000))))))
+          (adjust-point nil #ly1000))))
+    (unlock-enemy-if-lock-on marker)))
+
+(defun.ps+ lock-on-enemy (player enemy)
+  (let ((marker (get-entity-param player :target-marker)))
+    (set-entity-param marker :lock-on-enemy enemy)))
+
+(defun.ps+ lock-on-enemy-p (player)
+  (let ((marker (get-entity-param player :target-marker)))
+    (get-entity-param marker :lock-on-enemy)))
 
 ;; --- internal --- ;;
+
+(defun.ps+ unlock-enemy-if-lock-on (marker)
+  (set-entity-param marker :lock-on-enemy nil))
+
+(defun.ps+ get-target-marker-from-player (player)
+  (get-entity-param player :target-marker))
 
 (defun.ps+ calc-point-on-line (pnt1 pnt2 x-p value)
   (with-slots-pair (((x1 x) (y1 y)) pnt1
@@ -73,8 +90,21 @@
       :model (make-line :pos-a (list 0 (* -1 r))
                         :pos-b (list 0 r)
                         :color color)
-      :depth depth))
+      :depth depth)
+     (make-script-2d :func #'process-lock-on)
+     (init-entity-params :lock-on-enemy nil))
     marker))
+
+(defun.ps+ process-lock-on (marker)
+  (let ((enemy (get-entity-param marker :lock-on-enemy)))
+    (when enemy
+      (unless (find-the-entity enemy)
+        ;; TODO: release lock-on
+        (unlock-enemy-if-lock-on marker)
+        (return-from process-lock-on))
+      ;; Note: ignore angle
+      (copy-vector-2d-to (get-ecs-component 'point-2d marker)
+                         (calc-global-point enemy)))))
 
 (defmacro.ps+ get-marker-param (&rest rest)
   `(get-param :player :marker ,@rest))

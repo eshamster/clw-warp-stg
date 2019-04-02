@@ -39,10 +39,13 @@
      (make-circle-block :r #lx100
                         :point (make-point-2d :x #lx700 :y #lx200)))
     ;; Enemy
-    (add-ecs-entity
-     (make-circle-enemy :r #lx50
-                        :point (make-point-2d :x #lx200 :y #lx200)
-                        :duration 20))
+    (let ((enemy (make-circle-enemy :r #lx50
+                                    :point (make-point-2d :x #lx200 :y #lx200)
+                                    :duration 200)))
+      (add-ecs-component-list
+       enemy
+       (make-speed-2d :x #lx1))
+      (add-ecs-entity enemy))
     t)
   :process
   (state-lambda ()
