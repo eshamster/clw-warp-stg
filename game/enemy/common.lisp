@@ -23,7 +23,7 @@
                                    :width width :height height
                                    :color *default-color*)
                            :offset offset
-                           :depth (get-depth :block))
+                           :depth (get-depth :enemy))
      :duration duration)))
 
 (defun.ps+ make-circle-enemy (&key point r duration)
@@ -32,7 +32,7 @@
    :physic (make-physic-circle :r r)
    :model (make-model-2d :model (make-solid-circle
                                  :r r :color *default-color*)
-                         :depth (get-depth :block))
+                         :depth (get-depth :enemy))
    :duration duration))
 
 (defun.ps+ make-primitive-enemy (&key point physic model
