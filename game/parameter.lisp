@@ -37,7 +37,11 @@
                     :interval 8
                     :num-once 5
                     :barrel-dist #lx40
-                    :barrel-angle (* 2/3 PI))))))
+                    :barrel-angle (* 2/3 PI)))
+    :enemy (:shield (:r #lx30
+                     :duration 8
+                     :rotate-speed (/ PI 120)
+                     :shield (:width #lx12 :height #lx90 :dist #lx70))))))
 
 (defmacro.ps+ get-param (&rest keys)
   `(get-layered-hash *params* ,@keys))

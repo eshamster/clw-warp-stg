@@ -8,8 +8,8 @@
   (:import-from :clw-warp-stg/game/block
                 :make-rect-block
                 :make-circle-block)
-  (:import-from :clw-warp-stg/game/enemy/common
-                :make-circle-enemy)
+  (:import-from :clw-warp-stg/game/enemy/shield
+                :add-shield-enemy)
   (:import-from :clw-warp-stg/game/player/main
                 :init-player))
 (in-package :clw-warp-stg/game/state/main)
@@ -30,22 +30,10 @@
       (add-ecs-entity background))
     (init-player)
     ;; --- Test --- ;;
-    ;; Block
-    (add-ecs-entity
-     (make-rect-block :width #lx100 :height #lx200
-                      :point (make-point-2d :x #lx700 :y #lx600
-                                            :angle (* PI 1/6))))
-    (add-ecs-entity
-     (make-circle-block :r #lx100
-                        :point (make-point-2d :x #lx700 :y #lx200)))
     ;; Enemy
-    (let ((enemy (make-circle-enemy :r #lx50
-                                    :point (make-point-2d :x #lx200 :y #lx200)
-                                    :duration 200)))
-      (add-ecs-component-list
-       enemy
-       (make-speed-2d :x #lx1))
-      (add-ecs-entity enemy))
+    (dotimes (i 6)
+      (add-shield-enemy :point (make-point-2d :x (+ #lx200 (* i #lx150))
+                                              :y #lx200)))
     t)
   :process
   (state-lambda ()
