@@ -10,7 +10,8 @@
                 :lock-on-enemy-p)
   (:import-from :clw-warp-stg/game/player/utils
                 :init-basic-player
-                :warp-player-to))
+                :warp-player-to
+                :get-player-param))
 (in-package :clw-warp-stg/game/player/type1)
 
 (defun.ps+ init-player-type1 ()
@@ -25,8 +26,10 @@
 (defun.ps+ control-player (player)
   (when (or (key-down-now-p :a)
             (= (get-left-mouse-state) :down-now))
-    (warp-player-to
-     player (get-mouse-x) (get-mouse-y)))
+    (unless (or (find-block-under-mouse)
+                (find-enemy-under-mouse))
+      (warp-player-to
+       player (get-mouse-x) (get-mouse-y))))
   (flet ((move-target-to-mouse ()
            (move-target-to player (get-mouse-x) (get-mouse-y))))
     (when (key-down-now-p :b)
@@ -40,11 +43,17 @@
 
 ;; TODO: This should be shared with other player types.
 (defun.ps+ find-enemy-under-mouse ()
+  (find-target-under-mouse :enemy))
+
+(defun.ps+ find-block-under-mouse ()
+  (find-target-under-mouse :block))
+
+(defun.ps+ find-target-under-mouse (target-tag)
   (let ((mouse-entity (make-ecs-entity)))
     (add-ecs-component-list
      mouse-entity
      (make-point-2d :x (get-mouse-x) :y (get-mouse-y))
-     (make-physic-circle :r 0))
-    (do-tagged-ecs-entities (enemy :enemy)
-      (when (collide-entities-p mouse-entity enemy)
-        (return-from find-enemy-under-mouse enemy)))))
+     (make-physic-circle :r (get-player-param :r)))
+    (do-tagged-ecs-entities (target target-tag)
+      (when (collide-entities-p mouse-entity target)
+        (return-from find-target-under-mouse target)))))
