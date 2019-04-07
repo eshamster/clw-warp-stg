@@ -14,9 +14,10 @@
                 :init-player))
 (in-package :clw-warp-stg/game/state/main)
 
-(def-game-state main ((parent (make-ecs-entity)))
+(def-game-state main ((parent (make-ecs-entity))
+                      stage)
   :start-process
-  (state-lambda (parent)
+  (state-lambda (parent stage)
     (stack-default-ecs-entity-parent parent)
     (let ((background (make-ecs-entity)))
       (add-ecs-component-list
@@ -30,13 +31,15 @@
       (add-ecs-entity background))
     (init-player)
     ;; --- Test --- ;;
-    ;; Enemy
-    (dotimes (i 6)
-      (add-shield-enemy :point (make-point-2d :x (+ #lx200 (* i #lx150))
-                                              :y #lx200)))
+    (setf stage
+          (generate-stage
+            (dotimes (i 6)
+              (stage (:enemy-shield :time (* i 10)
+                                    :x (+ #lx200 (* i #lx120)) :y #ly200)))))
     t)
   :process
-  (state-lambda ()
+  (state-lambda (stage)
+    (process-stage stage)
     nil)
   :end-process
   (state-lambda (parent)

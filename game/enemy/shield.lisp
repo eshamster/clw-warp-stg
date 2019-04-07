@@ -28,6 +28,9 @@
     (add-ecs-entity enemy)
     (add-ecs-entity shield enemy)))
 
+(def-stage-element-interpreter.ps+ :enemy-shield ((x 0) (y 0) (angle 0))
+  (add-shield-enemy :point (make-point-2d :x x :y y :angle angle)))
+
 ;; --- internal --- ;;
 
 (defmacro.ps+ get-my-param (&rest rest)
