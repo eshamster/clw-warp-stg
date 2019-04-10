@@ -25,8 +25,8 @@
     (add-ecs-component-list
      enemy
      (make-script-2d :func #'rotate-body))
-    (add-ecs-entity enemy)
-    (add-ecs-entity shield enemy)))
+    (add-ecs-entity-to-buffer enemy)
+    (add-ecs-entity-to-buffer shield enemy)))
 
 (def-stage-element-interpreter.ps+ :enemy-shield ((x 0) (y 0) (angle 0))
   (add-shield-enemy :point (make-point-2d :x x :y y :angle angle)))

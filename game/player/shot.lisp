@@ -81,12 +81,14 @@
                        :target-tags (get-collision-target :shot)
                        :on-collision (lambda (mine other)
                                        (declare (ignore other))
-                                       (when (find-the-entity mine)
-                                         (delete-ecs-entity mine))))
+                                       (register-next-frame-func
+                                        (lambda ()
+                                          (when (find-the-entity mine)
+                                            (delete-ecs-entity mine))))))
      (make-script-2d :func #'delete-if-out-of-screen)
      (init-entity-params :width width
                          :height height))
-    (add-ecs-entity shot)))
+    (add-ecs-entity-to-buffer shot)))
 
 (defun.ps+ delete-if-out-of-screen (shot)
   (let ((margin (* 2 (max (get-entity-param shot :width)
