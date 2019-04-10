@@ -12,12 +12,13 @@
 (defun.ps+ init-func (scene)
   (init-clw-warp-stg-state)
   (init-default-systems :scene scene)
-  (init-input))
+  (init-input)
+  (setf-collider-model-enable t)
+  (setf-collider-model-depth 100))
 
 (defun.ps+ update-func ()
   (let ((count 0))
     (do-ecs-entities entity
       (incf count))
     (add-to-monitoring-log (+ "Entity count: " count)))
-  (setf-collider-model-enable t)
   (process-game-state))
