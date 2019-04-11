@@ -8,10 +8,14 @@
   (:import-from :clw-warp-stg/game/block
                 :make-rect-block
                 :make-circle-block)
+  (:import-from :clw-warp-stg/game/player/main
+                :init-player)
+  ;; TODO: Move to more appropriate package
+  ;;       (The followings are only to load)
   (:import-from :clw-warp-stg/game/enemy/shield
                 :add-shield-enemy)
-  (:import-from :clw-warp-stg/game/player/main
-                :init-player))
+  (:import-from :clw-warp-stg/game/enemy/warp-creep
+                :add-warp-creep-enemy))
 (in-package :clw-warp-stg/game/state/main)
 
 (def-game-state main ((parent (make-ecs-entity))
@@ -33,9 +37,24 @@
     ;; --- Test --- ;;
     (setf stage
           (generate-stage
+            #|
             (dotimes (i 6)
               (stage (:enemy-shield :time (* i 10)
-                                    :x (+ #lx200 (* i #lx120)) :y #ly200)))))
+                                    :x (+ #lx200 (* i #lx120)) :y #ly200)))
+            |#
+            (let ((num 12)
+                  (interval 4)
+                  (dist #lx120)
+                  (diff-dist #lx10))
+              (dotimes (i num)
+                (stage
+                 (:enemy-warp-creep :time (* i interval)
+                                    :first-dist (- dist (/ (* diff-dist i) num))
+                                    :diff-dist diff-dist
+                                    :first-angle (/ (* 2 PI i) num)
+                                    :diff-angle (* PI 1/10)
+                                    :warp-interval (* num interval)))))
+            ))
     t)
   :process
   (state-lambda (stage)

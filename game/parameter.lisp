@@ -41,7 +41,9 @@
     :enemy (:shield (:r #lx30
                      :duration 8
                      :rotate-speed (/ PI 120)
-                     :shield (:width #lx12 :height #lx90 :dist #lx70))))))
+                     :shield (:width #lx12 :height #lx90 :dist #lx70))
+            :warp-creep (:r #lx8
+                         :duration 2)))))
 
 (defmacro.ps+ get-param (&rest keys)
   `(get-layered-hash *params* ,@keys))
