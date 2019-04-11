@@ -7,7 +7,9 @@
   (:import-from :clw-warp-stg/game/parameter
                 :get-param
                 :get-depth
-                :get-collision-target))
+                :get-collision-target)
+  (:import-from :clw-warp-stg/game/utils
+                :out-of-screen-p))
 (in-package :clw-warp-stg/game/player/shot)
 
 (defun.ps+ make-shot-maker (&key fn-get-player-point
@@ -93,15 +95,11 @@
 (defun.ps+ delete-if-out-of-screen (shot)
   (let ((margin (* 2 (max (get-entity-param shot :width)
                           (get-entity-param shot :height)))))
-    (with-slots (x y) (calc-global-point shot)
-      (when (or (< x (- 0 margin))
-                (> x (+ #lx1000 margin))
-                (< y (- 0 margin))
-                (> y (+ #ly1000 margin)))
-        (register-next-frame-func
-         (lambda ()
-           (when (find-the-entity shot)
-             (delete-ecs-entity shot))))))))
+    (when (out-of-screen-p (calc-global-point shot) margin)
+      (register-next-frame-func
+       (lambda ()
+         (when (find-the-entity shot)
+           (delete-ecs-entity shot)))))))
 
 (defmacro.ps+ get-shot-param (&rest keys)
   `(get-param :player :shot ,@keys))
