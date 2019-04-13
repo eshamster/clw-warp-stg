@@ -20,12 +20,13 @@
     (add-ecs-component-list
      enemy
      (make-script-2d :func #'warp-creep))
-    (set-entity-param enemy :dist first-dist)
-    (set-entity-param enemy :diff-dist diff-dist)
-    (set-entity-param enemy :angle first-angle)
-    (set-entity-param enemy :diff-angle diff-angle)
-    (set-entity-param enemy :rest-to-warp warp-interval)
-    (set-entity-param enemy :warp-interval warp-interval)
+    (set-entity-param enemy
+                      :dist first-dist
+                      :diff-dist diff-dist
+                      :angle first-angle
+                      :diff-angle diff-angle
+                      :rest-to-warp warp-interval
+                      :warp-interval warp-interval)
     (add-ecs-entity-to-buffer enemy)))
 
 (def-stage-element-interpreter.ps+ :enemy-warp-creep
