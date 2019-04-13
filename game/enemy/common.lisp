@@ -8,51 +8,44 @@
            :make-circle-enemy)
   (:import-from :clw-warp-stg/game/parameter
                 :get-depth
-                :get-collision-target))
+                :get-collision-target)
+  (:import-from :clw-warp-stg/game/utils
+                :make-simple-rect-entity
+                :make-simple-circle-entity))
 (in-package :clw-warp-stg/game/enemy/common)
 
 (defun.ps+ make-rect-enemy (&key point width height duration)
-  (let ((offset (make-point-2d :x (* -1/2 width)
-                               :y (* -1/2 height))))
-    (make-primitive-enemy
-     :point point
-     :physic (make-physic-rect :width width
-                               :height height
-                               :offset offset)
-     :model (make-model-2d :model (make-solid-rect
-                                   :width width :height height
-                                   :color *default-color*)
-                           :offset offset
-                           :depth (get-depth :enemy))
-     :duration duration)))
+  (make-primitive-enemy
+   :basic-entity (make-simple-rect-entity
+                  :width width :height height
+                  :point point :color *default-color*
+                  :depth (get-depth :enemy))
+   :duration duration))
 
 (defun.ps+ make-circle-enemy (&key point r duration)
   (make-primitive-enemy
-   :point point
-   :physic (make-physic-circle :r r)
-   :model (make-model-2d :model (make-solid-circle
-                                 :r r :color *default-color*)
-                         :depth (get-depth :enemy))
+   :basic-entity (make-simple-circle-entity
+                  :r r
+                  :point point :color *default-color*
+                  :depth (get-depth :enemy))
    :duration duration))
 
-(defun.ps+ make-primitive-enemy (&key point physic model
-                                      duration)
-  (with-slots (target-tags on-collision) physic
-    (let ((on-collision-org on-collision))
-      (setf on-collision
-            (lambda (mine other)
-              (funcall on-collision-org mine other)
-              (when (has-entity-tag other :player-shot)
-                (on-collision-to-shot mine other)))))
-    (dolist (tag (get-collision-target :enemy))
-      (push tag target-tags)))
-  (let ((enemy (make-ecs-entity)))
-    (add-entity-tag enemy :enemy)
-    (add-ecs-component-list
-     enemy
-     physic model point
-     (init-entity-params :rest-duration duration))
-    enemy))
+(defun.ps+ make-primitive-enemy (&key basic-entity duration)
+  (assert (and duration (> duration 0)))
+  (add-entity-tag basic-entity :enemy)
+  (with-ecs-components (physic-2d) basic-entity
+    (with-slots (target-tags on-collision) physic-2d
+      (let ((on-collision-org on-collision))
+        (setf on-collision
+              (lambda (mine other)
+                (funcall on-collision-org mine other)
+                (when (has-entity-tag other :player-shot)
+                  (on-collision-to-shot mine other)))))
+      (dolist (tag (get-collision-target :enemy))
+        (push tag target-tags))))
+  (set-entity-param basic-entity
+                    :rest-duration duration)
+  basic-entity)
 
 ;; --- internal --- ;;
 
