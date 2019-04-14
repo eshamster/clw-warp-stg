@@ -3,7 +3,8 @@
         :ps-experiment
         ;; The followings are required to make package-inferred-system to recognize them
         :clw-warp-stg/game/state/global-init
-        :clw-warp-stg/game/state/main)
+        :clw-warp-stg/game/state/main
+        :clw-warp-stg/game/state/menu)
   (:export :init-clw-warp-stg-state)
   (:import-from :cl-web-2d-game
                 :init-game-state
