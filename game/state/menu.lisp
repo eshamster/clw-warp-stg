@@ -11,7 +11,7 @@
     t)
   :process
   (state-lambda ()
-    (make-state :main))
+    (make-state :main :stage-name :test))
   :end-process
   (state-lambda ()
     t))
