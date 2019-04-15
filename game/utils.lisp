@@ -5,7 +5,9 @@
         :cl-web-2d-game)
   (:export :out-of-screen-p
            :make-simple-rect-entity
-           :make-simple-circle-entity))
+           :make-simple-circle-entity
+           :add-on-collision-callback
+           :add-collision-target-list))
 (in-package :clw-warp-stg/game/utils)
 
 (defun.ps+ out-of-screen-p (point margin)
@@ -40,3 +42,18 @@
      (make-model-2d :model (make-solid-circle :r r :color color)
                     :depth depth))
     entity))
+
+;; --- collision --- ;;
+
+(defun.ps+ add-on-collision-callback (physic-2d callback)
+  (with-slots (target-tags on-collision) physic-2d
+    (let ((on-collision-org on-collision))
+      (setf on-collision
+            (lambda (mine other)
+              (funcall on-collision-org mine other)
+              (funcall callback mine other))))))
+
+(defun.ps+ add-collision-target-list (physic-2d target-list)
+  (with-slots (target-tags) physic-2d
+    (dolist (tag target-list)
+      (push tag target-tags))))

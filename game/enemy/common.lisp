@@ -11,7 +11,9 @@
                 :get-collision-target)
   (:import-from :clw-warp-stg/game/utils
                 :make-simple-rect-entity
-                :make-simple-circle-entity))
+                :make-simple-circle-entity
+                :add-on-collision-callback
+                :add-collision-target-list))
 (in-package :clw-warp-stg/game/enemy/common)
 
 (defun.ps+ make-rect-enemy (&key point width height duration)
@@ -34,15 +36,13 @@
   (assert (and duration (> duration 0)))
   (add-entity-tag basic-entity :enemy)
   (with-ecs-components (physic-2d) basic-entity
-    (with-slots (target-tags on-collision) physic-2d
-      (let ((on-collision-org on-collision))
-        (setf on-collision
-              (lambda (mine other)
-                (funcall on-collision-org mine other)
-                (when (has-entity-tag other :player-shot)
-                  (on-collision-to-shot mine other)))))
-      (dolist (tag (get-collision-target :enemy))
-        (push tag target-tags))))
+    (add-on-collision-callback
+     physic-2d
+     (lambda (mine other)
+       (when (has-entity-tag other :player-shot)
+                  (on-collision-to-shot mine other))))
+    (add-collision-target-list
+     physic-2d (get-collision-target :enemy)))
   (set-entity-param basic-entity
                     :rest-duration duration)
   basic-entity)

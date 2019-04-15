@@ -7,9 +7,14 @@
            :get-player
            :init-basic-player
            :warp-player-to)
+  (:import-from :clw-warp-stg/game/utils
+                :make-simple-circle-entity
+                :add-on-collision-callback
+                :add-collision-target-list)
   (:import-from :clw-warp-stg/game/parameter
                 :get-param
-                :get-depth)
+                :get-depth
+                :get-collision-target)
   (:import-from :clw-warp-stg/game/player/target-marker
                 :make-target-marker)
   (:import-from :clw-warp-stg/game/player/shot
@@ -48,17 +53,25 @@
 ;; --- internal --- ;;
 
 (defun.ps+ make-player-entity (target-marker)
-  (let ((player (make-ecs-entity)))
+  (let ((player (make-simple-circle-entity
+                 :point (make-point-2d :x #lx500 :y #ly500)
+                 :r (get-player-param :r)
+                 :color #x0000ff
+                 :depth (get-depth :player))))
     (add-entity-tag player :player)
-    (add-ecs-component-list
-     player
-     (make-point-2d :x #lx500 :y #ly500)
-     (make-model-2d
-      :model (make-solid-circle :r (get-player-param :r)
-                                :color #x0000ff)
-      :depth (get-depth :player))
-     (init-entity-params :target-marker target-marker))
+    (with-ecs-components (physic-2d) player
+      (add-on-collision-callback
+       physic-2d #'process-on-collision)
+      (add-collision-target-list
+       physic-2d (get-collision-target :player)))
+    (set-entity-param player
+                      :target-marker target-marker)
     player))
+
+(defun.ps+ process-on-collision (mine other)
+  (declare (ignore mine))
+  (add-to-event-log
+   (+ "player collides to: " (ecs-entity-id other))))
 
 (defun.ps+ make-line-to-marker (player marker)
   (let ((line (make-ecs-entity)))
