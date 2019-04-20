@@ -12,6 +12,8 @@
                 :init-player)
   ;; TODO: Move to more appropriate package
   ;;       (The followings are only to load)
+  (:import-from :clw-warp-stg/game/enemy/bomb
+                :add-bomb-enemy)
   (:import-from :clw-warp-stg/game/enemy/shield
                 :add-shield-enemy)
   (:import-from :clw-warp-stg/game/enemy/warp-creep

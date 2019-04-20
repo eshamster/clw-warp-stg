@@ -15,6 +15,7 @@
       (stage (:enemy-shield :time (* i 10)
                             :x (+ #lx200 (* i #lx120)) :y #ly200)))
     |#
+    #|
     (let ((num 12)
           (interval 4)
           (dist #lx120)
@@ -27,4 +28,6 @@
                             :first-angle (/ (* 2 PI i) num)
                             :diff-angle (* PI 1/10)
                             :warp-interval (* num interval)))))
+    |#
+    (:enemy-bomb :x #lx200 :y #ly200)
     ))

@@ -43,7 +43,12 @@
                      :rotate-speed (/ PI 120)
                      :shield (:width #lx12 :height #lx90 :dist #lx70))
             :warp-creep (:r #lx8
-                         :duration 2)))))
+                         :duration 2)
+            :bomb (:r #lx35
+                   :duration 24
+                   :shot (:num 16 :speed (:min #lx10 :max #lx12)
+                          :spread-angle (* PI 1/8)
+                          :gravity #lx0.5))))))
 
 (defmacro.ps+ get-param (&rest keys)
   `(get-layered-hash *params* ,@keys))
