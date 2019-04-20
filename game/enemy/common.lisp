@@ -5,7 +5,8 @@
         :cl-web-2d-game)
   (:export :make-primitive-enemy
            :make-rect-enemy
-           :make-circle-enemy)
+           :make-circle-enemy
+           :add-on-die-callback)
   (:import-from :clw-warp-stg/game/parameter
                 :get-depth
                 :get-collision-target)
@@ -44,8 +45,13 @@
     (add-collision-target-list
      physic-2d (get-collision-target :enemy)))
   (set-entity-param basic-entity
-                    :rest-duration duration)
+                    :rest-duration duration
+                    :on-die (list))
   basic-entity)
+
+(defun.ps+ add-on-die-callback (enemy callback)
+  "The callback takes enemy"
+  (push callback (get-entity-param enemy :on-die)))
 
 ;; --- internal --- ;;
 
@@ -55,7 +61,12 @@
   (when (<= (get-entity-param mine :rest-duration) 0)
     (register-next-frame-func
      (lambda ()
-       (when (find-the-entity mine)
-         (delete-ecs-entity mine))))))
+       (delete-enemy mine)))))
 
 (defvar.ps+ *default-color* #xee22222)
+
+(defun.ps+ delete-enemy (enemy)
+  (when (find-the-entity enemy)
+    (dolist (callback (get-entity-param enemy :on-die))
+      (funcall callback enemy))
+    (delete-ecs-entity enemy)))
