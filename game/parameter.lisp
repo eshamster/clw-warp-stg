@@ -55,7 +55,8 @@
       :shot -20
       :marker 200
       :block 100
-      :enemy 50)))
+      :enemy 50
+      :enemy-shot 50)))
 
 (defmacro.ps+ get-depth (&rest keys)
   `(get-layered-hash *depth* ,@keys))
@@ -66,7 +67,8 @@
 
 (defun.ps+ get-collision-target (kind)
   (ecase kind
-    (:player '(:block :enemy))
+    (:player '(:block :enemy :enemy-shot))
     (:shot '(:block :enemy))
-    (:block '(:shot :player))
-    (:enemy '(:shot :player))))
+    (:block '(:shot :player :enemy-shot))
+    (:enemy '(:shot :player))
+    (:enemy-shot '(:player :block))))
