@@ -21,8 +21,9 @@
     (add-on-die-callback enemy #'explode)
     (add-ecs-entity-to-buffer enemy)))
 
-(def-stage-element-interpreter.ps+ :enemy-bomb ((x 0) (y 0) (angle 0))
-  (add-bomb-enemy :point (make-point-2d :x x :y y :angle angle)))
+(def-stage-element-interpreter.ps+
+    (:enemy-bomb (:include :point)) ()
+  (add-bomb-enemy :point point))
 
 ;; --- internal --- ;;
 

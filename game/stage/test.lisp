@@ -29,5 +29,5 @@
                             :diff-angle (* PI 1/10)
                             :warp-interval (* num interval)))))
     |#
-    (:enemy-bomb :x #lx200 :y #ly200)
+    (:enemy-bomb (:point :x #lx200 :y #ly200))
     ))
