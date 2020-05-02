@@ -14,6 +14,25 @@
                 :with-slots-pair))
 (in-package :clw-warp-stg/game/player/target-marker)
 
+(defun.ps+ make-target-marker ()
+  (let ((marker (make-ecs-entity))
+        (r (get-marker-param :r))
+        (depth (get-depth :marker)))
+    (add-entity-tag marker :marker)
+    (let ((fn-enable-free-model (add-free-model marker r depth))
+          (fn-enable-lock-on-model (add-lock-on-model marker r depth)))
+      (add-ecs-component-list
+       marker
+       (make-point-2d :x #lx200 :y #ly500)
+       (make-script-2d :func #'process-lock-on)
+       (make-script-2d :func (lambda (entity)
+                               (let ((lock-on-p (get-entity-param
+                                                 entity :lock-on-enemy)))
+                                 (funcall fn-enable-free-model (not lock-on-p))
+                                 (funcall fn-enable-lock-on-model lock-on-p))))
+       (init-entity-params :lock-on-enemy nil)))
+    marker))
+
 ;; XXX: Should calc current-point as global point.
 ;;      And set it as local point of marker.
 ;;      Currently they are same.
@@ -67,33 +86,35 @@
       (make-point-2d :x (lerp-scalar x1 x2 lerp-alpha)
                      :y (lerp-scalar y1 y2 lerp-alpha)))))
 
-(defun.ps+ make-target-marker ()
-  (let ((marker (make-ecs-entity))
-        (r (get-marker-param :r))
-        (color #x0000ff)
-        (depth (get-depth :marker)))
-    (add-entity-tag marker :marker)
-    (add-ecs-component-list
-     marker
-     (make-point-2d :x #lx200 :y #ly500)
-     (make-model-2d
-      :model (make-wired-circle
-              :r r
-              :color color)
-      :depth depth)
-     (make-model-2d
-      :model (make-line :pos-a (list (* -1 r) 0)
-                        :pos-b (list r 0)
-                        :color color)
-      :depth depth)
-     (make-model-2d
-      :model (make-line :pos-a (list 0 (* -1 r))
-                        :pos-b (list 0 r)
-                        :color color)
-      :depth depth)
-     (make-script-2d :func #'process-lock-on)
-     (init-entity-params :lock-on-enemy nil))
-    marker))
+(defun.ps+ add-free-model (marker r depth)
+  (add-marker-model marker r depth #x0000ff))
+
+(defun.ps+ add-lock-on-model (marker r depth)
+  (add-marker-model marker r depth #xff0000))
+
+(defun.ps+ add-marker-model (marker r depth color)
+  (let* ((models (list (make-model-2d
+                        :model (make-wired-circle
+                                :r r
+                                :color color)
+                        :depth depth)
+                       (make-model-2d
+                        :model (make-line :pos-a (list (* -1 r) 0)
+                                          :pos-b (list r 0)
+                                          :color color)
+                        :depth depth)
+                       (make-model-2d
+                        :model (make-line :pos-a (list 0 (* -1 r))
+                                          :pos-b (list 0 r)
+                                          :color color)
+                        :depth depth))))
+    (dolist (model models)
+      (add-ecs-component model marker))
+    (lambda (enable-p)
+      (dolist (model models)
+        (if enable-p
+            (enable-model-2d marker :target-model-2d model)
+            (disable-model-2d marker :target-model-2d model))))))
 
 (defun.ps+ process-lock-on (marker)
   (let ((enemy (get-entity-param marker :lock-on-enemy)))
