@@ -21,6 +21,7 @@
      (init-entity-params
       :interval (get-shot-param :interval)
       :rest-interval 0
+      :barrel-r (get-shot-param :barrel-r)
       :barrel-dist (get-shot-param :barrel-dist)
       :barrel-angle (get-shot-param :barrel-angle)
       :num-once (get-shot-param :num-once)
@@ -40,10 +41,12 @@
                   (funcall (my-param :fn-get-target-point))
                   (my-param :barrel-angle)
                   (my-param :barrel-dist)
+                  (my-param :barrel-r)
                   (my-param :num-once)))))
 
-(defun.ps+ make-shots (player-point target-point barrel-angle barrel-r num-once)
-  (let* ((shot-center player-point)
+(defun.ps+ make-shots (player-point target-point barrel-angle barrel-dist barrel-r num-once)
+  (let* ((shot-center (calc-shot-center
+                       player-point target-point barrel-dist barrel-r))
          (dist (calc-dist shot-center target-point))
          ;; Angle from a line passing through center-point and target-point
          (max-angle (/ (* barrel-r (sin barrel-angle))
@@ -54,6 +57,12 @@
                           (+ (* max-angle -1)
                              (* 2 max-angle (/ i (1- num-once)))))
        target-point))))
+
+(defun.ps+ calc-shot-center (player-point target-point barrel-dist barrel-r)
+  ;; The barrel-dist means minimum distance to the barrel circle
+  (let ((to-target (sub-vector-2d target-point player-point)))
+    (setf-vector-2d-abs to-target (- barrel-dist barrel-r))
+    (add-vector-2d player-point to-target)))
 
 (defun.ps+ make-one-shot (start-point target-point)
   (let* ((shot (make-ecs-entity))

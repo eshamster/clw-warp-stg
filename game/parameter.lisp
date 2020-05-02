@@ -36,8 +36,9 @@
                     :speed #lx15
                     :interval 8
                     :num-once 5
-                    :barrel-dist #lx40
-                    :barrel-angle (* 1/3 PI)))
+                    :barrel-dist #lx20
+                    :barrel-r #lx50
+                    :barrel-angle (* 1/6 PI)))
     :enemy (:shield (:r #lx30
                      :duration 8
                      :rotate-speed (/ PI 120)
