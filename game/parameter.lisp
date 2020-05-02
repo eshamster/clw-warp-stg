@@ -59,6 +59,7 @@
      (:background -1000
       :player 0
       :shot -20
+      :shot-line -40
       :marker 200
       :block 100
       :enemy 50

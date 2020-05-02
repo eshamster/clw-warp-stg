@@ -19,6 +19,8 @@
                 :make-target-marker)
   (:import-from :clw-warp-stg/game/player/shot
                 :make-shot-maker)
+  (:import-from :clw-warp-stg/game/player/shot-line
+                :make-shot-line)
   (:import-from :ps-experiment/common-macros
                 :setf-with
                 :with-slots-pair))
@@ -27,17 +29,19 @@
 (defun.ps+ init-basic-player ()
   (let* ((marker (make-target-marker))
          (player (make-player-entity marker))
-         (line (make-line-to-marker player marker))
+         (fn-get-player-point (lambda () (calc-global-point player)))
+         (fn-get-target-point (lambda () (calc-global-point marker)))
          (shot-maker (make-shot-maker
-                      :fn-get-player-point (lambda ()
-                                             (calc-global-point player))
-                      :fn-get-target-point (lambda ()
-                                             (calc-global-point marker)))))
+                      :fn-get-player-point fn-get-player-point
+                      :fn-get-target-point fn-get-target-point))
+         (shot-line (make-shot-line
+                     :fn-get-player-point fn-get-player-point
+                     :fn-get-target-point fn-get-target-point)))
     (add-ecs-entity player)
     (add-ecs-entity shot-maker player)
+    (add-ecs-entity shot-line player)
     (add-ecs-entity marker)
-    (add-ecs-entity line)
-    (values player marker line)))
+    (values player marker)))
 
 (defmacro.ps+ get-player-param (&rest keys)
   `(get-param :player ,@keys))
@@ -73,28 +77,3 @@
   (add-to-event-log
    (+ "player collides to: " (ecs-entity-id other))))
 
-(defun.ps+ make-line-to-marker (player marker)
-  (let ((line (make-ecs-entity)))
-    (add-entity-tag line :player-to-target-line)
-    (add-ecs-component-list
-     line
-     (make-point-2d)
-     (make-line-to-marker-model player marker)
-     (make-script-2d
-      :func (lambda (entity)
-              (update-model-2d
-               entity (find-model-2d-by-label entity :line)
-               (make-line-to-marker-model player marker)))))
-    line))
-
-(defun.ps+ make-line-to-marker-model (player marker)
-  (flet ((get-xy-list (entity)
-           (let ((point (calc-global-point entity)))
-             (list (point-2d-x point)
-                   (point-2d-y point)))))
-    (make-model-2d
-     :model (make-line :pos-a (get-xy-list player)
-                       :pos-b (get-xy-list marker)
-                       :color #xddddee)
-     :depth (1- (get-depth :marker))
-     :label :line)))
