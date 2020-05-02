@@ -36,25 +36,24 @@
            (get-entity-param maker key)))
     (when (<= (my-param :rest-interval) 0)
       (set-entity-param maker :rest-interval (my-param :interval))
-      (let* ((player-point
-              (funcall (my-param :fn-get-player-point)))
-             (target-point
-              (funcall (my-param :fn-get-target-point)))
-             (angle-to-target (vector-2d-angle
-                               (sub-vector-2d target-point player-point)))
-             (barrel-angle (my-param :barrel-angle))
-             (barrel-dist (my-param :barrel-dist))
-             (num-once (my-param :num-once)))
-        (dotimes (i num-once)
-          (let* ((diff-angle (+ (* barrel-angle -1/2)
-                                (* barrel-angle
-                                   (/ i (1- num-once)))))
-                 (shot-angle (+ angle-to-target diff-angle)))
-            (make-one-shot
-             (add-vector-2d player-point
-                            (make-vector-2d :x (* barrel-dist (cos shot-angle))
-                                            :y (* barrel-dist (sin shot-angle))))
-             target-point)))))))
+      (make-shots (funcall (my-param :fn-get-player-point))
+                  (funcall (my-param :fn-get-target-point))
+                  (my-param :barrel-angle)
+                  (my-param :barrel-dist)
+                  (my-param :num-once)))))
+
+(defun.ps+ make-shots (player-point target-point barrel-angle barrel-r num-once)
+  (let* ((shot-center player-point)
+         (dist (calc-dist shot-center target-point))
+         ;; Angle from a line passing through center-point and target-point
+         (max-angle (/ (* barrel-r (sin barrel-angle))
+                       (- dist (* barrel-r (cos barrel-angle))))))
+    (dotimes (i num-once)
+      (make-one-shot
+       (calc-start-vector shot-center target-point barrel-r
+                          (+ (* max-angle -1)
+                             (* 2 max-angle (/ i (1- num-once)))))
+       target-point))))
 
 (defun.ps+ make-one-shot (start-point target-point)
   (let* ((shot (make-ecs-entity))
@@ -82,8 +81,7 @@
      (make-physic-rect :width width :height height
                        :target-tags (get-collision-target :shot)
                        :on-collision (lambda (mine other)
-                                       (declare (ignore other))
-                                       (register-next-frame-func
+                                       (declare (ignore other))                                       (register-next-frame-func
                                         (lambda ()
                                           (when (find-the-entity mine)
                                             (delete-ecs-entity mine))))))
@@ -91,6 +89,36 @@
      (init-entity-params :width width
                          :height height))
     (add-ecs-entity-to-buffer shot)))
+
+(defun.ps+ calc-start-vector (shot-center target-point barrel-r angle)
+  (let* ((dist (calc-dist shot-center target-point))
+         (r barrel-r)
+         (base-angle (vector-2d-angle
+                      (sub-vector-2d target-point shot-center)))
+         (vec (calc-start-vector% r dist angle)))
+    (incf-rotate-diff vec r (vector-2d-angle vec) base-angle)
+    (add-vector-2d shot-center vec)))
+
+(defun.ps+ calc-start-vector% (r dist angle)
+  "Calculate start point
+when center of shot circle is origin and shot target is on x axis.
+  - r: Radious of circle.
+  - dist: Distance to target from origin.
+  - angle: Shot angle from x axis."
+  ;; The result (x, y) statisfy the followings.
+  ;;   - (dist - x) * tan(angle) = y
+  ;;   - x^2 + y^2 = r^2
+  ;;   - x > 0
+  (let* ((tan (tan angle))
+         (tan2 (expt tan 2))
+         (d (+ (expt r 2)
+               (* (expt r 2) tan2)
+               (* -1 (expt dist 2) tan2)))
+         (sd (sqrt d)))
+    (make-vector-2d :x (/ (+ (* dist tan2) sd)
+                          (+ tan2 1))
+                    :y (/ (* tan (- dist sd))
+                          (+ tan2 1)))))
 
 (defun.ps+ delete-if-out-of-screen (shot)
   (let ((margin (* 2 (max (get-entity-param shot :width)

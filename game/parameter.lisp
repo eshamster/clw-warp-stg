@@ -37,7 +37,7 @@
                     :interval 8
                     :num-once 5
                     :barrel-dist #lx40
-                    :barrel-angle (* 2/3 PI)))
+                    :barrel-angle (* 1/3 PI)))
     :enemy (:shield (:r #lx30
                      :duration 8
                      :rotate-speed (/ PI 120)
